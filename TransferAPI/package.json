@@ -10,7 +10,10 @@
     "src"
   ],
   "dependencies": {
-    "express": "^4.16.2"
+    "express": "^4.16.2",
+    "windows-network-drive": "^2.1.1",
+    "underscore": "~1.9.1",
+    "dotenv": "^6.0.0"
   },
   "author": "Daniel Salazar",
   "license": "MIT"
