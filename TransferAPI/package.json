@@ -10,10 +10,13 @@
     "src"
   ],
   "dependencies": {
+    "delay": "^4.0.0",
+    "dotenv": "^6.0.0",
     "express": "^4.16.2",
-    "windows-network-drive": "^2.1.1",
+    "read-last-lines": "^1.6.0",
+    "robocopy": "^0.1.16",
     "underscore": "~1.9.1",
-    "dotenv": "^6.0.0"
+    "windows-network-drive": "^2.1.1"
   },
   "author": "Daniel Salazar",
   "license": "MIT"

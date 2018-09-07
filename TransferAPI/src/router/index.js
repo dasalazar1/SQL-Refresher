@@ -1,7 +1,9 @@
 'use strict';
-var networkDrive = require('windows-network-drive');
+var mapper = require('../../controllers/mapper');
+var robo = require('../../controllers/robocopyer');
+var stat = require('../../controllers/status');
 var Readable = require('stream').Readable;
-var _ = require('underscore');
+var delay = require('delay');
 
 
 module.exports = function (app) {
@@ -12,45 +14,24 @@ module.exports = function (app) {
     });
 
   app.route('/transferfile')
-    .get(function(req,res){
-      var source = req.query.source;
-      var destination = req.query.destination;
-      var sourceRDN = req.query.sourceRDN == 'true';
-      var destinationRDN = req.query.destinationRDN == 'true';
+    .get(function(req, res){
 
       var s = new Readable();
       s._read = () => {}; 
       s.pipe(res);
       s.pipe(process.stdout);
 
-      var sourceMouted = findAndMountDrive(s, source, 
-                                            sourceRDN ? process.env.RDN_USER : undefined,
-                                            sourceRDN ? process.env.RDN_PASSWORD : undefined )
-      var destMounted = findAndMountDrive(s, destination, 
-                                            destinationRDN ? process.env.RDN_USER : undefined,
-                                            destinationRDN ? process.env.RDN_PASSWORD : undefined )
-
-      Promise.all([sourceMouted, destMounted]).then(result => {s.push('all mounted\n'); s.push(null)});
-      
+      mapper(req,res)
+      .then(function() { return robo(req,res) })
+      .then(result => delay(2000))
+      .then(result => {s.push('File moved\n'); s.push(null) });
     });
 
-    function findAndMountDrive(stream, path, username, password){
-      return new Promise(function(resolve){
+  app.route('/status')
+    .get(function(req,res){
 
-        stream.push("finding: " + path + "\n");
-        networkDrive.find(path)
-        .then(function(driveLetter){
-          if(driveLetter.length == 0)
-          {
-            networkDrive.mount(path, undefined, username, password)
-              .then(function(driveLetter2){
-                stream.push("done: " + path + "\n");
-                resolve(driveLetter2);
-              });
-          }
-        });
-      });
-    };
-
+      stat(req,res);
+      
+    });
 
 };
