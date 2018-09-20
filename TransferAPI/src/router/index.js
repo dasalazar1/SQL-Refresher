@@ -22,9 +22,12 @@ module.exports = function (app) {
       s.pipe(process.stdout);
 
       mapper(req,res)
-      .then(function() { return robo(req,res) })
-      .then(result => delay(2000))
-      .then(result => {s.push('File moved\n'); s.push(null) });
+      .then(result => {s.push('all mounted\n'); })
+      .then(() => { 
+        return robo(req,res)
+      })
+      .then(result => {s.push('File moved\n'); s.push(null) })
+      .catch(err => s.push(err.message));
     });
 
   app.route('/status')

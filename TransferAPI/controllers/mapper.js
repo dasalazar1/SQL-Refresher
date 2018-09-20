@@ -22,7 +22,7 @@ module.exports = function(req,res){
                                         destinationRDN ? process.env.RDN_USER : undefined,
                                         destinationRDN ? process.env.RDN_PASSWORD : undefined )
 
-  return Promise.all([sourceMouted, destMounted]).then(result => {s.push('all mounted\n'); });
+  return Promise.all([sourceMouted, destMounted]);
   
 }
 
