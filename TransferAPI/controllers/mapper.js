@@ -45,6 +45,7 @@ function findAndMountDrive(stream, path, username, password){
         stream.push("Path already mounted: " + path + "\n");
         resolve(driveLetter);
       }
-    });
+    })
+    .catch(err => s.push("mapper find and mount error: " + err.message));;
   });
 };

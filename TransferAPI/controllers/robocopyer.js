@@ -13,7 +13,8 @@ module.exports = function(req,res){
   return robocopy({ source: source,
               destination: destination,
               files: file,
-              copy: { restartMode: true },
+              copy: { /*restartMode: true*/ },
+              retry: { count: 2, wait: 10},
               logging: {output: {file: 'C:\\Code\\Refresher\\TransferAPI\\public\\robo.log', overwrite: true}}
             });
 
