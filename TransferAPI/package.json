@@ -4,7 +4,9 @@
   "description": "Handles the mounting of remote folders and robocopy",
   "main": "./src/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server",
+    "debug": "node --nolazy --inspect-brk=9229 server"
   },
   "files": [
     "src"

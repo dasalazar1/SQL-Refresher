@@ -1,51 +1,45 @@
 var networkDrive = require('windows-network-drive');
-var Readable = require('stream').Readable;
+//var Readable = require('stream').Readable;
 
 
 
-module.exports = function(req,res){
+module.exports = function(job){
+    var source = job.data.source;
+    var destination = job.data.destination;
+    var sourceRDN = job.data.sourceRDN == 'true';
+    var destinationRDN = job.data.destinationRDN == 'true';
 
-  var source = req.query.source;
-  var destination = req.query.destination;
-  var sourceRDN = req.query.sourceRDN == 'true';
-  var destinationRDN = req.query.destinationRDN == 'true';
+    var sourceMouted = findAndMountDrive(job, source, 
+                                          sourceRDN ? process.env.RDN_USER : undefined,
+                                          sourceRDN ? process.env.RDN_PASSWORD : undefined );
+    var destMounted = findAndMountDrive(job, destination, 
+                                          destinationRDN ? process.env.RDN_USER : undefined,
+                                          destinationRDN ? process.env.RDN_PASSWORD : undefined );
 
-  var s = new Readable();
-  s._read = () => {}; 
-  s.pipe(res);
-  s.pipe(process.stdout);
-
-  var sourceMouted = findAndMountDrive(s, source, 
-                                        sourceRDN ? process.env.RDN_USER : undefined,
-                                        sourceRDN ? process.env.RDN_PASSWORD : undefined )
-  var destMounted = findAndMountDrive(s, destination, 
-                                        destinationRDN ? process.env.RDN_USER : undefined,
-                                        destinationRDN ? process.env.RDN_PASSWORD : undefined )
-
-  return Promise.all([sourceMouted, destMounted]);
-  
+    return Promise.all([sourceMouted, destMounted]);
 }
 
-function findAndMountDrive(stream, path, username, password){
-  return new Promise(function(resolve){
-
-    stream.push("finding: " + path + "\n");
+function findAndMountDrive(job, path, username, password){
+  return new Promise(function(resolve, reject){
+    job.log("finding: " + path + "\n");
     networkDrive.find(path)
     .then(function(driveLetter){
       if(driveLetter.length == 0)
       {
-        networkDrive.mount(path, undefined, username, password)
-          .then(function(driveLetter2){
-            stream.push("done: " + path + "\n");
-            resolve(driveLetter2);
-          });
+          networkDrive.mount(path, undefined, username, password)
+          .then(function(driveletter2){
+            resolve(driveletter2)
+          })
+          .catch(function(error){
+            job.log(error)
+            reject(error)
+          })
       }
       else
       {
-        stream.push("Path already mounted: " + path + "\n");
+        job.log("Path already mounted: " + path + "\n");
         resolve(driveLetter);
       }
     })
-    .catch(err => s.push("mapper find and mount error: " + err.message));;
-  });
-};
+  })
+}
