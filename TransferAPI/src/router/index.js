@@ -3,8 +3,8 @@ var mapper = require('../../controllers/mapper');
 var robo = require('../../controllers/robocopyer');
 var stat = require('../../controllers/status');
 var Readable = require('stream').Readable;
-var delay = require('delay');
 var kue = require('kue');
+
 
 module.exports = function (app) {
 
@@ -12,27 +12,32 @@ module.exports = function (app) {
   kue.app.listen(3900);
   queue.on('job enqueue', function(){
     console.log('job enqueued');
+  }).on('job progress', function(id, progress){
+    kue.Job.get(id,function(err, job){
+      console.log('\nJob: ' + job.id + ' Progress: ' + progress + ' Progress Data: ' + JSON.stringify(job.progress_data) + '\n')
+    })
   })
 
   queue.process('refresh',(job, done) => {
     console.log('Working on job: ' + job.id);
-    job.data.status = 'In Process';
 
     mapper(job)
       .then(function(driveletters){
-        console.log('DriveLetters: ' + driveletters)
+        console.log('DriveLetters: ' + driveletters);
+        job.progress(1,3,{driveLetters: driveletters});
+      })
+      .then(function(){
+        return robo(job);
       })
       .catch(function(indexErr){
         if (indexErr)
           console.log("index error: " + indexErr.message)
         else
           console.log('no errors');  
+      })
+      .finally(function(){
+        done();
       });
-      // .then(result => {s.push('all mounted\n'); })
-      // .then(() => {return robo(req,res)})
-      // .then(result => {s.push('File moved\n'); s.push(null) })
-      // .catch(err => s.push("index error: " + err.message));
-
   });
 
   app.route('/')
