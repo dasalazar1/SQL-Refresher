@@ -1,7 +1,4 @@
 var networkDrive = require('windows-network-drive');
-//var Readable = require('stream').Readable;
-
-
 
 module.exports = function(job){
     var source = job.data.source;
@@ -21,11 +18,12 @@ module.exports = function(job){
 
 function findAndMountDrive(job, path, username, password){
   return new Promise(function(resolve, reject){
-    job.log("finding: " + path + "\n");
+    job.log("Finding: " + path + "\n");
     networkDrive.find(path)
     .then(function(driveLetter){
       if(driveLetter.length == 0)
       {
+          job.log("Mounting: " + path + "\n");
           networkDrive.mount(path, undefined, username, password)
           .then(function(driveletter2){
             resolve(driveletter2)
@@ -40,6 +38,10 @@ function findAndMountDrive(job, path, username, password){
         job.log("Path already mounted: " + path + "\n");
         resolve(driveLetter);
       }
+    })
+    .catch(function(error){
+      job.log(error)
+      reject(error)
     })
   })
 }

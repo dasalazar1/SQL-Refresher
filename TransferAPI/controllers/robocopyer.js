@@ -19,6 +19,7 @@ module.exports = function(job){
   var watcherPromise = new Promise(function(resolve, reject){
 
     var reg = /([0-9 \.]*%)(?!\s*[0-9 \.]*%)|Ended/
+    var regEnd = /100%|Ended/
     var interval = setInterval(() => {
 
       readLastLines.read('C:\\Code\\Refresher\\TransferAPI\\public\\' + job.id + '.log', 10)
@@ -27,7 +28,7 @@ module.exports = function(job){
           //console.log('data: ' + reg.exec(line)[0]);
           job.progress(2,3, {transferPercent: match ? match[0] : 'no data'})
 
-          if(reg.test(line)){
+          if(regEnd.test(line)){
             clearInterval(interval);
             resolve('transfer done');            
           }

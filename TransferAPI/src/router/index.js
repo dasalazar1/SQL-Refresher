@@ -29,11 +29,8 @@ module.exports = function (app) {
       .then(function(){
         return robo(job);
       })
-      .catch(function(indexErr){
-        if (indexErr)
-          console.log("index error: " + indexErr.message)
-        else
-          console.log('no errors');  
+      .catch(function(jobErr){
+        done(jobErr);
       })
       .finally(function(){
         done();
