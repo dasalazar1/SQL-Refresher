@@ -7,14 +7,14 @@
         {
             "type": "chrome",
             "request": "launch",
-            "name": "Launch Chrome",
+            "name": "Chrome",
             "url": "http://localhost:3000",
             "webRoot": "${workspaceFolder}/refresher-ui"
         },
         {
             "type": "node",
             "request": "launch",
-            "name": "Launch API",
+            "name": "API",
             "cwd": "${workspaceFolder}/TransferAPI",
             "runtimeExecutable": "npm",
             "runtimeArgs": [
@@ -28,6 +28,12 @@
             "request": "attach",
             "name": "Attach by Process ID",
             "processId": "${command:PickProcess}"
+        }
+    ],
+    "compounds": [
+        {
+            "name": "Server/Client",
+            "configurations": ["API", "Chrome"]
         }
     ]
 }
