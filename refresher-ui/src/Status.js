@@ -9,13 +9,13 @@ class Status extends Component {
   }
 
   getStatus(){
-    var url = 'http://localhost:3500/status';
+    var url = '/status';
     http.get(url, function(res){
         var js = JSON.stringify(res.body);
         this.setState({status: js});
     });
 
-    // fetch('http://localhost:3500/status')
+    // fetch('/status')
     //   .then(results => {
     //     var js = JSON.stringify(results.body);
     //     this.setState({status: js});
@@ -25,7 +25,7 @@ class Status extends Component {
   componentDidMount() {
 
     this.interval = setInterval(() => {
-      fetch('http://localhost:3500/status')
+      fetch('/status')
       .then(response => {console.log(response); return response.json();})
       .then(data => this.setState({ status: data.status }));
     }, 1000);

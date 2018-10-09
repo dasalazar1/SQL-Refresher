@@ -24,7 +24,7 @@ class Transfer extends Component {
     console.log('source: ' + this.state.source + '\n'
           + 'dest: ' + this.state.dest + '\n'
           + 'file: ' + this.state.file);
-    var url = 'http://localhost:3500/transferfile?source=' + this.state.source
+    var url = '/transferfile?source=' + this.state.source
               + '&sourceRDN=false&destination=' + this.state.dest
               + '&destinationRDN=true&file=' + this.state.file;
     http.get(url, function(res){
