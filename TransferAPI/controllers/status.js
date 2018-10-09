@@ -6,7 +6,6 @@ module.exports = function(req,res){
   readLastLines.read('C:\\Code\\Refresher\\TransferAPI\\public\\robo.log', 1)
     .then((line) => {
       res.writeHead(200, {'Content-Type': 'application/json'});
-      var status = line;
       res.write('{"status": "' + line.trim() + '"}');
       res.end();
       
