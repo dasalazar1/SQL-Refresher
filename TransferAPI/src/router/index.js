@@ -8,9 +8,7 @@ const util = require("util");
 
 module.exports = function(app) {
   var queue = kue.createQueue({
-    redis:
-      "redis://redis-12161.c52.us-east-1-4.ec2.cloud.redislabs.com:12161?password=" +
-      process.env.REDIS_PASSWORD
+    redis: "redis://redis-12161.c52.us-east-1-4.ec2.cloud.redislabs.com:12161?password=" + process.env.REDIS_PASSWORD
   });
   kue.app.listen(3900);
   queue
@@ -19,15 +17,7 @@ module.exports = function(app) {
     })
     .on("job progress", function(id, progress) {
       kue.Job.get(id, function(err, job) {
-        console.log(
-          "\nJob: " +
-            job.id +
-            " Progress: " +
-            progress +
-            " Progress Data: " +
-            JSON.stringify(job.progress_data) +
-            "\n"
-        );
+        console.log("\nJob: " + job.id + " Progress: " + progress + " Progress Data: " + JSON.stringify(job.progress_data) + "\n");
       });
     });
 
@@ -71,6 +61,19 @@ module.exports = function(app) {
       });
   });
 
+  app.route("/jobs").get(function(req, res) {
+    let listJobs = util.promisify(kue.Job.rangeByType);
+    let completed = listJobs("refresh", "complete", 0, 50, "asc").then(jobs => {
+      return jobs.map(j => ({ id: j.id, file: j.data.file }));
+    });
+
+    let active = listJobs("refresh", "active", 0, 50, "asc").then(jobs => {
+      return jobs.map(j => ({ id: j.id, file: j.data.file }));
+    });
+
+    Promise.all([active, completed]).then(results => res.send(results));
+  });
+
   app.route("/status").get(function(req, res) {
     let transferId = req.query.transferId;
 
@@ -79,10 +82,7 @@ module.exports = function(app) {
       .then(job => {
         let overallProgress = job.toJSON().progress;
         let step = overallProgress === 33 ? "Mounting" : "Transfering";
-        let transferPercent =
-          overallProgress == 100
-            ? 100
-            : parseInt(job.toJSON().progress_data.transferPercent);
+        let transferPercent = overallProgress == 100 ? 100 : parseInt(job.toJSON().progress_data.transferPercent);
 
         let status = { step: step, percent: transferPercent };
 

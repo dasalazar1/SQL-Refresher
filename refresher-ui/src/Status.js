@@ -9,7 +9,7 @@ class Status extends Component {
 
   componentDidMount() {
     this.interval = setInterval(() => {
-      fetch("/status")
+      fetch("/status?transferId=" + this.props.transferId)
         .then(response => {
           console.log(response);
           return response.json();
