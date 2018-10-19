@@ -3,13 +3,15 @@ var mapper = require("../../controllers/mapper");
 var robo = require("../../controllers/robocopyer");
 var stat = require("../../controllers/status");
 var Readable = require("stream").Readable;
-var kue = require("kue");
+var kue = require("kue-cors");
 const util = require("util");
+var cors = require("cors");
 
 module.exports = function(app) {
   var queue = kue.createQueue({
     redis: "redis://redis-12161.c52.us-east-1-4.ec2.cloud.redislabs.com:12161?password=" + process.env.REDIS_PASSWORD
   });
+  //kue.app.use(cors());
   kue.app.listen(3900);
   queue
     .on("job enqueue", function() {
@@ -90,7 +92,7 @@ module.exports = function(app) {
       })
       .catch(err => {
         console.error("Status Error: " + err);
-        res.send({ error: "something went wrong. Please try again." });
+        res.send({ error: "Something went wrong. Please try again." });
       });
   });
 };

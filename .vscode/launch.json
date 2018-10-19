@@ -31,12 +31,6 @@
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run-script", "dev"],
       "port": 9229
-    },
-    {
-      "type": "node",
-      "request": "attach",
-      "name": "Attach by Process ID",
-      "processId": "${command:PickProcess}"
     }
   ],
   "compounds": [
