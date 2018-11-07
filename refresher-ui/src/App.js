@@ -3,6 +3,7 @@ import "./App.css";
 import { Route, NavLink, HashRouter } from "react-router-dom";
 import Transfer from "./Transfer";
 import Status from "./Status";
+import StatusList from "./StatusList";
 
 class App extends Component {
   render() {
@@ -17,13 +18,14 @@ class App extends Component {
               </NavLink>
             </li>
             <li>
-              <NavLink to="/status/0" replace>
+              <NavLink to="/status" replace>
                 Status
               </NavLink>
             </li>
           </ul>
           <div className="content">
             <Route exact path="/" component={Transfer} />
+            <Route exact path="/status" component={StatusList} />
             <Route path="/status/:id" component={Status} />
           </div>
         </div>

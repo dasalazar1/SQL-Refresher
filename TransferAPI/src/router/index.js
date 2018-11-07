@@ -3,7 +3,7 @@ var mapper = require("../../controllers/mapper");
 var robo = require("../../controllers/robocopyer");
 var stat = require("../../controllers/status");
 var Readable = require("stream").Readable;
-var kue = require("kue-cors");
+var kue = require("kue");
 const util = require("util");
 var cors = require("cors");
 
@@ -82,12 +82,17 @@ module.exports = function(app) {
     let gJob = util.promisify(kue.Job.get);
     gJob(transferId)
       .then(job => {
-        let overallProgress = job.toJSON().progress;
-        let step = overallProgress === 33 ? "Mounting" : "Transfering";
-        let transferPercent = overallProgress == 100 ? 100 : parseInt(job.toJSON().progress_data.transferPercent);
+        let jobJson = job.toJSON();
+        let error = jobJson.error;
+        let status = {};
 
-        let status = { step: step, percent: transferPercent };
+        if (error) {
+          throw error;
+        }
 
+        let overallProgress = jobJson.progress;
+        status.step = overallProgress === 33 ? "Mounting" : "Transfering";
+        status.percent = overallProgress == 100 ? 100 : parseInt(jobJson.progress_data.transferPercent);
         res.send(status);
       })
       .catch(err => {
